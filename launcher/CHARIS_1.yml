@@ -1,0 +1,62 @@
+# 
+# CHARIS.yml -- CHARIS launchers file 
+#
+# This is a YAML file
+
+tabname: "CHARIS"
+launchers:
+  -
+    label: "Ramp by count"
+    cmd: GETOBJECT OBE_ID=CHARIS OBE_MODE=SPEC EXPTYPE=$VAL01 NRESET=$VAL02 NREAD=$VAL03 EXPTIME=0 NRAMPS=$VAL04 FILTER=$VAL05
+    params:
+      - [ VAL04, INPUT, 3, 1, "NumRamps" ]
+      - [ VAL01, LIST, [ OBJECT, DARK, LASER, SKYFLAT, STANDARD_STAR, TEST ], "Exposure type" ]
+      - [ VAL05, LIST, ["J", "K", "ND", "Broadband", "H"], "Filter Name" ]
+      - break
+      - [ VAL02, INPUT, 3, 1, "Nreset" ]
+      - [ VAL03, INPUT, 6, 2, "Nread (1.475s)" ]
+
+  -
+    label: "Ramp by time"
+    cmd: GETOBJECT OBE_ID=CHARIS OBE_MODE=SPEC EXPTYPE=$VAL01 NRESET=$VAL02 NREAD=0 EXPTIME=$VAL03 NRAMPS=$VAL04 FILTER=$VAL05
+    params:
+      - [ VAL04, INPUT, 3, 1, "NumRamps" ]
+      - [ VAL01, LIST, [ OBJECT, DARK, LASER, SKYFLAT, STANDARD_STAR, TEST ], "Exposure type" ]
+      - [ VAL05, LIST, ["J", "K", "ND", "Broadband", "H"], "Filter Name" ]
+      - break
+      - [ VAL02, INPUT, 3, 1, "Nreset" ]
+      - [ VAL03, INPUT, 6, 0, "Exposure time" ]
+
+  - sep
+
+  -
+    label: "Shutter"
+    cmd: EXEC CHARIS SHUTTER POS=$VAL01
+    params:
+      - [ VAL01, LIST, [ "Open", "Closed" ] ]
+
+  - sep
+
+  -
+    label: "Filter"
+    cmd: EXEC CHARIS FILTER NAME=$VAL01
+    params:
+      - [ VAL01, LIST, ["J", "K", "ND", "Broadband", "H"], "Filter Name" ]
+
+  - sep
+
+  -
+    label: "Grism"
+    cmd: EXEC CHARIS GRISM POS=$VAL01
+    params:
+      - [ VAL01, LIST, [["Low res.", LO], ["High res.", HI], [ "Out of beam", OUT]]]
+
+  - sep
+
+  -
+    label: "Sleep"
+    cmd: EXEC CHARIS SLEEP SLEEP_TIME=$VAL01
+    params:
+      - [ VAL01, INPUT, 3, 2, "Seconds" ]
+
+  - sep

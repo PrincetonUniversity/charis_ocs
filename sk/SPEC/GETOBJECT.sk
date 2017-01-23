@@ -1,0 +1,44 @@
+:Header
+
+# Take NRAMPS ramp frames
+#
+# Author: Loomis, Jeschke
+
+:Parameter
+    NRAMPS=1
+    FILTER=H
+    EXPTYPE=OBJECT
+    NRESET=1
+    NREAD=0
+    EXPTIME=0
+
+:Command
+:start
+
+# Clear integgui obsinfo message panel
+Exec OBS Set_Message obsinfo1=clear obsinfo2=clear obsinfo3=clear \
+           obsinfo4=clear obsinfo5=clear ;
+
+:main_start
+
+# Make all moves before startng any ramps
+EXEC OBS Set_Message obsinfo2="Changing filter to $FILTER ..." ;
+Exec CHARIS Filter name=$FILTER ;
+EXEC OBS Set_Message obsinfo2="Filter changed to $FILTER" ;
+
+
+*FOR $NRAMPS NUM IN
+    # To be consistent with non-Gen2 observing, we currently allocate the frame ID
+    # inside the g2cam program, not here.
+    #Exec OBS Memory instrument_name=CHARIS FRAME=&get_f_no[CHARIS A9] ;
+    Exec OBS Set_Message obsinfo2="Taking ramp number $NUM ..." ;
+    Exec OBS Timer duration=($EXPTIME + ($NREAD + $NRESET)*1.5);
+
+    #Exec CHARIS Ramp frame_no=!MEMORY.CRS.FRAME exptype=$EXPTYPE nreset=$NRESET nread=$NREAD exptime=$EXPTIME ;
+    Exec CHARIS Ramp exptype=$EXPTYPE nreset=$NRESET nread=$NREAD exptime=$EXPTIME ;
+*ENDFOR
+
+:main_end
+
+
+:end
