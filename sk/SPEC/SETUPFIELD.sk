@@ -1,0 +1,173 @@
+:Header
+OBE_ID=CHARIS
+OBE_MODE=SPEC
+COMMAND=SETUPFIELD
+SCRIPT_ID=SETUPFIELD.sk
+SCRIPT_UPDATE=2017.03.13
+SCRIPT_AUTHOR=Kudo
+SCRIPT_MODIFIED_BY=Jeschke
+
+Parameter:
+# Object
+OBJECT=UNDEF
+RA=!STATS.RA
+DEC=!STATS.DEC
+EQUINOX=2000
+COORD=ABS
+TARGET=NONE
+FIELD_PA=0.0
+PMRA=0.0
+PMDEC=0.0
+
+# Telescope
+Z=!TSCL.Z
+
+# AO188
+AO_OFFSET=0.0
+GSMODE=NGS
+*GSMODE=NGS,LGS
+
+# ADC
+ADC="IN"
+*ADC=IN,OUT
+
+
+# Tracking
+TRACMODE=SIDEREAL
+*TRACMODE=SIDEREAL,ADI,NO
+
+# WPU
+POL=NOP
+*POL=LINEAR,CIRCULAR,NO
+
+# AO ADC value
+  ANG1=0.0
+  ANG2=0.0
+  FC=1.0
+
+:Command
+:start
+
+:main_start
+
+# Forgot WPU?
+#        *IF $WOL == "PDI"
+#                *IF $POL != "LINEAR" AND $POL != "CIRCULAR"
+#                        Exec OBS Sound Select="ircs_horn" Volume=128 ,
+#                        Exec OBS Confirmation Instrument_Name=HICIAO Title="Forgot WPU? No Action in This Warning." Dialog=[OK] ;
+#               *ENDIF
+#        *ENDIF
+
+# Move telescope
+        *SET INFO1="Move Telescope"
+        Exec OBS Set_Message Instrument_Name=HICIAO OBSInfo1=$INFO1,
+        Exec OBS Sound Select=E_TELMOVE Volume=128 ,
+
+# AO188 Stop Loop
+        # Loop stop
+        EXEC AO188 CNTMON CMD=GAIN ARG=CLEAR ;
+        EXEC AO188 LOOP CMD=STOP ;
+
+        # stop ADF loop
+        *IF $GSMODE == "LGS"
+            EXEC AO188 ADF CMD=LOOP ARG=OFF ;
+        *ENDIF
+        
+        # Close all shutter and filter wheel in WFS
+        {
+                EXEC AO188 WFS WFS=HO DEV=LASH CMD=CLOSE ,
+                EXEC AO188 WFS WFS=LO DEV=LASH CMD=CLOSE ;
+                EXEC AO188 WFS WFS=HO DEV=LAFW CMD=GO POS=CLOSE ,
+                EXEC AO188 WFS WFS=LO DEV=LAFW CMD=GO POS=CLOSE ;
+        } ;
+
+        # TT zero, DM flat, and WTT flat
+        EXEC AO188 CNTMON CMD=TT ARG=ZERO ;
+        EXEC AO188 CNTMON CMD=DM ARG=FLAT ;
+        EXEC AO188 CNTMON CMD=WTT ARG=FLAT ;
+
+        # Stop AU tracking
+        EXEC AO188 AU_TRACK DEV=AU1 MOVE=FREE ;
+        EXEC AO188 AU_TRACK DEV=AU2 MOVE=FREE ;
+
+        Exec OBS Sound Select=SOUND_LADY_KAKUGO Volume=128 ,
+        Exec OBS Confirmation Instrument_Name=HICIAO Title="Is AO Ready for Slewing?" Dialog=[OK] ;
+
+# Setup OBE for AO
+{
+   {
+        #ImR
+#        {
+#                Exec AO188 IMGROT MOVE=FREE ;
+#                *IF $TRACMODE == "SIDEREAL"
+#                    Exec AO188 IMGROT Move=LINK Coord=$COORD TARGET=$TARGET RA=$RA DEC=$DEC EQUINOX=$EQUINOX Position=( $AO_OFFSET + $FIELD_PA ) TMODE="SID" ,
+#                *ELIF $TRACMODE == "ADI"
+#                    Exec AO188 IMGROT Move=LINK Coord=$COORD TARGET=$TARGET RA=$RA DEC=$DEC EQUINOX=$EQUINOX Position=( $AO_OFFSET + $FIELD_PA ) TMODE="ADI" ,
+#                *ENDIF
+#        } ,
+
+        {
+               Exec AO188 IMGROT MOVE=FREE ;
+               *IF $TRACMODE == "SIDEREAL"
+                    Exec AO188 IMGROT Move=LINK Coord=$COORD TARGET=$TARGET RA=$RA DEC=$DEC EQUINOX=$EQUINOX Position=( $AO_OFFSET + $FIELD_PA ) TMODE="SID" PID_MODE="LOWVIB" ,
+               *ELIF $TRACMODE == "ADI"
+                    Exec AO188 IMGROT Move=LINK Coord=$COORD TARGET=$TARGET RA=$RA DEC=$DEC EQUINOX=$EQUINOX Position=( $AO_OFFSET + $FIELD_PA ) TMODE="ADI" PID_MODE="LOWVIB",
+               *ENDIF
+       } ,
+
+
+        #ADC
+        {
+                Exec AO188 SADC MOVE=FREE ;        
+                Exec AO188 SADC MOVE=$ADC ;
+                *IF $ADC == "IN"
+                    *IF $TRACMODE == "ADI"
+                    Exec AO188 SADC MOVE=LINK COORD=$COORD RA=$RA DEC=$DEC EQUINOX=$EQUINOX PA=$FIELD_PA ANG1=$ANG1 ANG2=$ANG2 FC=$FC TARGET=$TARGET MODE=ADI ,
+                    *ELSE
+                    Exec AO188 SADC MOVE=LINK COORD=$COORD RA=$RA DEC=$DEC EQUINOX=$EQUINOX PA=$FIELD_PA ANG1=$ANG1 ANG2=$ANG2 FC=$FC TARGET=$TARGET MODE=NORMAL ,
+                    *ENDIF
+                *ELSE
+                Exec AO188 SADC MOVE=BASE ,
+                *ENDIF
+        } ,
+
+        #AO
+       {
+                *IF "$GSMODE" == "LGS"
+                    Exec OBS Memory Instrument_Name=AO188 RATT=$RA DECTT=$DEC ,
+                    *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="OPT-LGS" INS="HICIAO" HABS="IN" LGSAP="20ASEC" CONFIRMATION="NO"
+                *ELIF "$GSMODE" == "NGS"
+                    *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="OPT-NGS" INS="HICIAO" HABS="IN" NGSAP="20ASEC" CONFIRMATION="NO"
+                *ENDIF
+        } ,
+
+        # TEL FOCUS
+        {
+                *IF $POL == LINEAR
+                    Exec TSC TelFocus Motor=on Coord=TSC F_Select=Ns_IR z=($Z + 0.1) ,
+                *ELIF $POL == CIRCULAR
+                    Exec TSC TelFocus Motor=on Coord=TSC F_Select=Ns_IR z=($Z + 0.1) ,
+                *ELSE
+                    Exec TSC TelFocus Motor=on Coord=TSC F_Select=Ns_IR z=$Z ,
+                *ENDIF
+
+                *IF $COORD == FILE
+                    EXEC TSC TELDRIVE MOTOR=ON COORD=FILE TARGET=$TARGET DIRECTION=TSC PMRA=$PMRA PMDEC=$PMDEC ,
+                *ELSE
+                    EXEC TSC TELDRIVE MOTOR=ON COORD=ABS RA=$RA DEC=$DEC EQUINOX=$EQUINOX DIRECTION=TSC PMRA=$PMRA PMDEC=$PMDEC ,
+                *ENDIF
+        } ;
+     };
+       
+     *IF "$GSMODE" == "LGS"
+        *SUB AO188_TRKLGSFOC OBE_ID=AO188 OBE_MODE=LAUNCHER GSMODE="$GSMODE"
+     *ENDIF
+};
+
+
+# Wait until telescope stabilizes
+        Exec OBS SLEEP SLEEP_TIME=5 ;
+
+:main_end
+:end
+
