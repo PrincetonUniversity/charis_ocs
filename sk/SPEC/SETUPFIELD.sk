@@ -64,13 +64,13 @@ POL=NOP
 #        *IF $WOL == "PDI"
 #                *IF $POL != "LINEAR" AND $POL != "CIRCULAR"
 #                        Exec OBS Sound Select="ircs_horn" Volume=128 ,
-#                        Exec OBS Confirmation Instrument_Name=HICIAO Title="Forgot WPU? No Action in This Warning." Dialog=[OK] ;
+#                        Exec OBS Confirmation Instrument_Name=CHARIS Title="Forgot WPU? No Action in This Warning." Dialog=[OK] ;
 #               *ENDIF
 #        *ENDIF
 
 # Move telescope
         *SET INFO1="Move Telescope"
-        Exec OBS Set_Message Instrument_Name=HICIAO OBSInfo1=$INFO1,
+        Exec OBS Set_Message Instrument_Name=CHARIS OBSInfo1=$INFO1,
         Exec OBS Sound Select=E_TELMOVE Volume=128 ,
 
 # AO188 Stop Loop
@@ -97,7 +97,7 @@ POL=NOP
         EXEC AO188 AU_TRACK DEV=AU2 MOVE=FREE ;
 
         Exec OBS Sound Select=SOUND_LADY_KAKUGO Volume=128 ,
-        Exec OBS Confirmation Instrument_Name=HICIAO Title="Is AO Ready for Slewing?" Dialog=[OK] ;
+        Exec OBS Confirmation Instrument_Name=CHARIS Title="Is AO Ready for Slewing?" Dialog=[OK] ;
 
 # Setup OBE for AO
 {
