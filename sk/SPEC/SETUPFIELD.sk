@@ -36,7 +36,6 @@ Z=!TSCL.Z
 # AO188
 AO_OFFSET=0.0
 GSMODE=NGS
-*GSMODE=NGS,LGS
 
 # ADC
 ADC="IN"
@@ -80,10 +79,6 @@ POL=NOP
         EXEC AO188 LOOP CMD=STOP ;
 
         # stop ADF loop
-        *IF $GSMODE == "LGS"
-            EXEC AO188 ADF CMD=LOOP ARG=OFF ;
-        *ENDIF
-        
         # Close all shutter and filter wheel in WFS
         {
                 EXEC AO188 WFS WFS=HO DEV=LASH CMD=CLOSE ,
@@ -144,11 +139,8 @@ POL=NOP
 
         #AO
        {
-                *IF "$GSMODE" == "LGS"
-                    Exec OBS Memory Instrument_Name=AO188 RATT=$RA DECTT=$DEC ,
-                    *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="OPT-LGS" INS="HICIAO" HABS="IN" LGSAP="20ASEC" CONFIRMATION="NO"
-                *ELIF "$GSMODE" == "NGS"
-                    *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="OPT-NGS" INS="HICIAO" HABS="IN" NGSAP="20ASEC" CONFIRMATION="NO"
+                *IF "$GSMODE" == "NGS"
+                    *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="OPT-NGS" INS="CHARIS" HABS="IN" NGSAP="20ASEC" CONFIRMATION="NO"
                 *ENDIF
         } ,
 
@@ -169,10 +161,6 @@ POL=NOP
                 *ENDIF
         } ;
      };
-       
-     *IF "$GSMODE" == "LGS"
-        *SUB AO188_TRKLGSFOC OBE_ID=AO188 OBE_MODE=LAUNCHER GSMODE="$GSMODE"
-     *ENDIF
 };
 
 
