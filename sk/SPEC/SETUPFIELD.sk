@@ -3,9 +3,20 @@ OBE_ID=CHARIS
 OBE_MODE=SPEC
 COMMAND=SETUPFIELD
 SCRIPT_ID=SETUPFIELD.sk
-SCRIPT_UPDATE=2017.03.13
+SCRIPT_UPDATE=2017.03.15
 SCRIPT_AUTHOR=Kudo
 SCRIPT_MODIFIED_BY=Jeschke
+SCRIPT_MODIFIED_BY=Loomis
+
+# Loomis notes foe CHARIS:
+#   This file was once HICIAO's SETUPFIELD.
+#
+# - replaced hiciao with charis
+# - removed all traces of LGS GSMODE
+# ? What is AO188's TRACMODE?
+# ? Does CHARIS care about polarizarion?
+# ? Who/What actually sets FITS.CRS.OBJECT?
+# ? What is COORD=FILE for the TSC TELDRIVE command?
 
 Parameter:
 # Object
