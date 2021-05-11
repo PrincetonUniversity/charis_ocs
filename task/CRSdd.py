@@ -55,8 +55,8 @@ class Obcp_Mode(CHARISTask):
         super(Obcp_Mode, self).__init__('Obcp_Mode', motor=motor, mode=mode)
 
 class Ramp(CHARISTask):
-    def __init__(self, exptype=None, nreset=None, nread=None, exptime=None):
-        super(Ramp, self).__init__('Ramp', exptype=exptype, nreset=nreset, nread=nread, exptime=exptime)
+    def __init__(self, exptype=None, nreset=None, nread=None, exptime=None, objname=None):
+        super(Ramp, self).__init__('Ramp', exptype=exptype, nreset=nreset, nread=nread, exptime=exptime, objname=objname)
 
 class Setup(CHARISTask):
     def __init__(self, etime=None, data_type=None, nreset=None, nread=None):
