@@ -7,7 +7,7 @@ tabname: "CHARIS"
 launchers:
   -
     label: "Ramp by count"
-    cmd: GETOBJECT OBE_ID=CHARIS OBE_MODE=SPEC EXPTYPE=$VAL01 NRESET=$VAL02 NREAD=$VAL03 EXPTIME=0 NRAMPS=$VAL04 FILTER=$VAL05
+    cmd: GETOBJECT OBE_ID=CHARIS OBE_MODE=SPEC EXPTYPE=$VAL01 NRESET=$VAL02 NREAD=$VAL03 EXPTIME=0 NRAMP=$VAL04 FILTER=$VAL05 OBJECT="$VAL06"
     params:
       - [ VAL04, INPUT, 3, 1, "NumRamps" ]
       - [ VAL01, LIST, [ OBJECT, DARK, LASER, SKYFLAT, STANDARD_STAR, TEST ], "Exposure type" ]
@@ -15,10 +15,11 @@ launchers:
       - break
       - [ VAL02, INPUT, 3, 1, "Nreset" ]
       - [ VAL03, INPUT, 6, 2, "Nread (1.475s)" ]
+      - [ VAL06, INPUT, 12, DARK, "Object Name" ]
 
   -
     label: "Ramp by time"
-    cmd: GETOBJECT OBE_ID=CHARIS OBE_MODE=SPEC EXPTYPE=$VAL01 NRESET=$VAL02 NREAD=0 EXPTIME=$VAL03 NRAMPS=$VAL04 FILTER=$VAL05
+    cmd: GETOBJECT OBE_ID=CHARIS OBE_MODE=SPEC EXPTYPE=$VAL01 NRESET=$VAL02 NREAD=0 EXPTIME=$VAL03 NRAMP=$VAL04 FILTER=$VAL05 OBJECT="$VAL06"
     params:
       - [ VAL04, INPUT, 3, 1, "NumRamps" ]
       - [ VAL01, LIST, [ OBJECT, DARK, LASER, SKYFLAT, STANDARD_STAR, TEST ], "Exposure type" ]
@@ -26,6 +27,7 @@ launchers:
       - break
       - [ VAL02, INPUT, 3, 1, "Nreset" ]
       - [ VAL03, INPUT, 6, 0, "Exposure time" ]
+      - [ VAL06, INPUT, 12, DARK, "Object Name" ]
 
   - sep
 

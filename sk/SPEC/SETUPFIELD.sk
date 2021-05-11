@@ -8,7 +8,7 @@ SCRIPT_AUTHOR=Kudo
 SCRIPT_MODIFIED_BY=Jeschke
 SCRIPT_MODIFIED_BY=Loomis
 
-# Loomis notes foe CHARIS:
+# Loomis notes for CHARIS:
 #   This file was once HICIAO's SETUPFIELD.
 #
 # - replaced hiciao with charis
@@ -18,7 +18,7 @@ SCRIPT_MODIFIED_BY=Loomis
 # ? Who/What actually sets FITS.CRS.OBJECT?
 # ? What is COORD=FILE for the TSC TELDRIVE command?
 
-Parameter:
+:Parameter
 # Object
 OBJECT=UNDEF
 RA=!STATS.RA
@@ -138,11 +138,9 @@ POL=NOP
         } ,
 
         #AO
-       {
-                *IF "$GSMODE" == "NGS"
-                    *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="OPT-NGS" INS="CHARIS" HABS="IN" NGSAP="20ASEC" CONFIRMATION="NO"
-                *ENDIF
-        } ,
+	{
+                *SUB AO188_SETMODE OBE_ID=AO188 OBE_MODE=AO188_SETUP MODE="SCEXAO" INS="SCEXAO" CONFIRMATION="NO" HABS="IN" NGSAP="20ASEC"
+	},
 
         # TEL FOCUS
         {
@@ -158,6 +156,8 @@ POL=NOP
                     EXEC TSC TELDRIVE MOTOR=ON COORD=FILE TARGET=$TARGET DIRECTION=TSC PMRA=$PMRA PMDEC=$PMDEC ,
                 *ELSE
                     EXEC TSC TELDRIVE MOTOR=ON COORD=ABS RA=$RA DEC=$DEC EQUINOX=$EQUINOX DIRECTION=TSC PMRA=$PMRA PMDEC=$PMDEC ,
+                    # from when the UPS 1 died and the telescope needed to be moved very slowly
+                    #*SUB ACQUIRE_TARGET OBE_ID=COMMON OBE_MODE=PROTO RA=$RA DEC=$DEC EQUINOX=$EQUINOX ,
                 *ENDIF
         } ;
      };
